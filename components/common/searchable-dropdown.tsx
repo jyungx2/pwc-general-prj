@@ -6,6 +6,8 @@ import ChevronUp from "@/assets/chevron-up.svg";
 import ChevronDown from "@/assets/chevron-down.svg";
 import Button from "@/components/common/button";
 import { SearchableDropdownProps } from "@/models/company";
+import { useQuery } from "@tanstack/react-query";
+import { axiosClient } from "@/lib/axiosClient";
 
 export default function SearchableDropdown({
   label,
@@ -17,29 +19,19 @@ export default function SearchableDropdown({
   const [selected, setSelected] = useState<string | null>(null); // 🔹 현재 선택된 회사명
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const options: string[] = [
-    "삼성전자",
-    "두산에너빌리티",
-    "LG",
-    "CJ제일제당",
-    "셀트리온헬스케어",
-    "SK케미칼",
-    "고려신용정보",
-    "HD현대",
-    "한국항공우주",
-    "에코프로",
-    "LG이노텍",
-    "카카오뱅크",
-    "삼성중공업",
-    "대한항공",
-    "하이브",
-    "SK바이오사이언스",
-  ];
+  const { data: options } = useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const res = await axiosClient.get("/companies");
+      const data = await res.data.companies;
+      return data;
+    },
+  });
 
   // 검색 필터링
   const filteredOptions = useMemo<string[]>(() => {
     if (!keyword.trim()) return options;
-    return options.filter((opt) =>
+    return options.filter((opt: string) =>
       opt.toLowerCase().includes(keyword.toLowerCase())
     );
   }, [keyword, options]);

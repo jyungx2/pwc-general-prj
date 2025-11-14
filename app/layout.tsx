@@ -4,6 +4,7 @@ import { pretendard } from "@/app/fonts";
 import MainHeader from "@/components/main-header/main-header";
 import banner from "@/assets/banner.png";
 import Image from "next/image";
+import Providers from "@/app/providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,17 +21,19 @@ export default function RootLayout({
       <body
         className={`max-w-[1680px] mx-auto ${pretendard.variable} font-sans antialiased px-10`}
       >
-        <MainHeader />
-        <div className="relative w-full h-96">
-          <Image
-            src={banner}
-            alt="banner"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        {children}
+        <Providers>
+          <MainHeader />
+          <div className="relative w-full h-96">
+            <Image
+              src={banner}
+              alt="banner"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          {children}
+        </Providers>
       </body>
     </html>
   );
