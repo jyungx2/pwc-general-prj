@@ -1,47 +1,32 @@
-"use client";
-
-import CompanyTable from "@/components/contents/company-table";
-import CompanyDetailModal from "@/components/contents/company-detail";
-import SubHeader from "@/components/contents/sub-header";
-import { Pagination } from "@/components/pagination/pagination";
+import HomeClient from "@/components/contents/home-client";
 import { Company } from "@/models/company";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { axiosClient } from "@/lib/axiosClient";
 
-export default function Home() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 50;
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const email = "cloundyon31@gmail.com";
-
-  const { data: favorites } = useQuery({
-    queryKey: ["favorites"],
-    queryFn: async () => {
-      const res = await axiosClient.get(`/favorites?email=${email}`);
-      const data = res.data.items; // 실제 데이터(items)는 항상 AxiosResponse 객체(res)의 "data"안에 존재
-      console.log("data: ", data);
-      return data;
-    },
-  });
-
-  return (
-    <div className="my-24 flex flex-col gap-[2.4rem]">
-      <SubHeader />
-      <CompanyTable favorites={favorites} onRowClick={setSelectedCompany} />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-
-      {/* ✅ 상세 모달: 선택된 회사가 있을 때만 */}
-      {selectedCompany && (
-        <CompanyDetailModal
-          data={selectedCompany}
-          onClose={() => setSelectedCompany(null)} // 배경 클릭 시 닫기
-        />
-      )}
-    </div>
+async function getFavorites(email: string): Promise<Company[]> {
+  // 백엔드 도메인으로 직접 호출 (외부 API)
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/favorites?email=${email}`,
+    {
+      cache: "no-store", // SSR (항상 새로 그리기) 느낌
+      //   cache: "force-cache", // 기본값 ("같은 fetch 결과를 캐시로 재사용해도 된다”는 허용만 하는 옵션으로, revalidate를 쓰면 N초마다 다시 확인하는 ISR, revalidate 없이 쓰면 캐시를 쓰는데, 재검증 주기는 다른 레벨(경로/루트 레벨 설정 등)에 따라 결정한다는 의미)
+      //   next: { revalidate: N } → ISR (캐시 + 주기적 재검증) 설정
+    }
   );
+
+  if (!res.ok) {
+    // 에러 핸들링은 상황에 맞게 (에러 페이지로 throw 등)
+    throw new Error("관심기업 조회 실패");
+  }
+
+  const data = await res.json();
+  return data.items; // 백엔드 응답 구조에 맞게 수정
+}
+
+export default async function Home() {
+  const email = "cloundyon31@gmail.com"; // 나중에 로그인 유저 정보에서 가져오면 됨
+
+  // 서버에서 미리 관심기업 데이터 가져오기
+  const favorites = await getFavorites(email);
+
+  // "클라이언트" 컴포넌트에 props로 넘김
+  return <HomeClient initialFavorites={favorites} />;
 }
