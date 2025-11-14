@@ -12,6 +12,7 @@ export type Props = {
 };
 
 export type CompanyTableProps = {
+  favorites: Company[];
   onRowClick: (company: Company) => void;
 };
 

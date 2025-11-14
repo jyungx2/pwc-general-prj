@@ -1,6 +1,7 @@
 "use client";
 
 import { CompanyTableProps } from "@/models/company";
+import { formatKoreanDateTime } from "@/utils/formatDate";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 
@@ -21,7 +22,10 @@ export const rows = [
   },
 ];
 
-export default function CompanyTable({ onRowClick }: CompanyTableProps) {
+export default function CompanyTable({
+  favorites,
+  onRowClick,
+}: CompanyTableProps) {
   // const [selected, setSelected] = useState<number[]>([]);
   // const allChecked = selected.length === rows.length && rows.length > 0;
   const [checked, setChecked] = useState(false);
@@ -91,34 +95,34 @@ export default function CompanyTable({ onRowClick }: CompanyTableProps) {
           </colgroup>
 
           <tbody className="text-text-heading font-regular divide-y divide-border divide-grey-300">
-            {rows.map((r) => {
+            {favorites?.map((row) => {
               // const checked = selected.includes(r.id);
               return (
                 <tr
-                  key={r.id}
+                  key={row.id}
                   className={` hover:bg-primary-100 ${
                     checked ? "bg-primary-100" : ""
                   } [&>td]:px-4 [&>td]:py-3`}
-                  onClick={() => onRowClick(r)}
+                  onClick={() => onRowClick(row)}
                 >
                   {/* scope="row" : 행 헤더    (row header) 이 th 오른쪽 가로 방향(row)의 td들과 연결 */}
                   <td>
                     <input
                       type="checkbox"
-                      id={`check-${r.id}`}
+                      id={`check-${row.id}`}
                       className="peer inputUnset checkboxCustom"
                     />
                     <label
                       className="flex gap-4 cursor-pointer items-end justify-center before:w-8 before:h-8 before:inline-block before:content-[''] before:bg-[url('/icons/unchecked.svg')] peer-checked:before:bg-[url('/icons/checked.svg')] font-gowunBold text-[18px]"
-                      htmlFor={`check-${r.id}`}
+                      htmlFor={`check-${row.id}`}
                     ></label>
                   </td>
-                  <td>{r.company_name}</td>
-                  <td>{r.created_at}</td>
+                  <td>{row.company_name}</td>
+                  <td>{formatKoreanDateTime(row.created_at)}</td>
                   <td className="text-right">
                     <button
                       className="rounded p-1 hover:bg-red-50 text-grey-300 cursor-pointer"
-                      aria-label={`${r.company_name} 삭제`}
+                      aria-label={`${row.company_name} 삭제`}
                       onClick={() => {
                         /* 삭제 mutate */
                       }}

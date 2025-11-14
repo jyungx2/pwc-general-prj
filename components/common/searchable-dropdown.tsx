@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import ChevronUp from "@/assets/chevron-up.svg";
 import ChevronDown from "@/assets/chevron-down.svg";
 import Button from "@/components/common/button";
@@ -52,6 +52,7 @@ export default function SearchableDropdown({
       memo: "",
     },
   });
+  const companyName = watch("company_name");
 
   // useMutation 제네릭 순서: useMutation<TData, TError, TVariables, TContext>()
   const saveMemoMutation = useMutation<
