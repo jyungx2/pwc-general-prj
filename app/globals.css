@@ -35,11 +35,17 @@ img {
   pointer-events: none;
 }
 
+.error,
+.error:focus-within {
+  border: 2px solid #e73434;
+}
+
 @theme {
   --font-sans: var(
     --font-pretendard
   ); /* Tailwind의 폰트 토큰(font-sans)에 Pretendard를 연결 */
 
+  --color-red: #e73434;
   --color-black: #000000;
   --color-white: #ffffff;
   --color-default: #3e3e3e;

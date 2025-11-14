@@ -6,8 +6,20 @@ import ChevronUp from "@/assets/chevron-up.svg";
 import ChevronDown from "@/assets/chevron-down.svg";
 import Button from "@/components/common/button";
 import { SearchableDropdownProps } from "@/models/company";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosClient } from "@/lib/axiosClient";
+import { useForm } from "react-hook-form";
+import ErrorMsg from "@/components/common/error-msg";
+
+type SaveMemoPayload = {
+  email: string;
+  company_name: string;
+  memo: string;
+};
+
+type SaveMemoResponse = {
+  message: string;
+};
 
 export default function SearchableDropdown({
   label,
@@ -15,37 +27,81 @@ export default function SearchableDropdown({
   onChange,
 }: SearchableDropdownProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [keyword, setKeyword] = useState("");
-  const [selected, setSelected] = useState<string | null>(null); // 🔹 현재 선택된 회사명
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: options } = useQuery({
+  const { data: options = [] } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
       const res = await axiosClient.get("/companies");
-      const data = await res.data.companies;
+      const data = res.data.companies;
       return data;
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    mode: "onSubmit", // submit 시에만 유효성 검사 (기본값)
+    reValidateMode: "onChange", //  에러 상태일 때, 언제 다시 검사할지
+    defaultValues: {
+      email: "cloundyon31@gmail.com",
+      company_name: "",
+      memo: "",
+    },
+  });
+
+  // useMutation 제네릭 순서: useMutation<TData, TError, TVariables, TContext>()
+  const saveMemoMutation = useMutation<
+    SaveMemoResponse,
+    Error,
+    SaveMemoPayload
+  >({
+    mutationFn: async (payload: {
+      email: string;
+      company_name: string;
+      memo: string;
+    }) => {
+      console.log("payload: ", payload);
+      const res = await axiosClient.post<SaveMemoResponse>(
+        "/favorites",
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      console.log("POST 요청 성공 후 받아온 데이터: ", data);
+      alert(data.message ?? "저장되었습니다!");
+      // setContent("");
+    },
+    onError: () => {
+      alert("저장 중 오류가 발생했습니다.");
+    },
+  });
+
+  const onSubmit = (data: SaveMemoPayload) => {
+    saveMemoMutation.mutate(data);
+  };
+
   // 검색 필터링
   const filteredOptions = useMemo<string[]>(() => {
-    if (!keyword.trim()) return options;
+    if (!companyName.trim()) return options;
     return options.filter((opt: string) =>
-      opt.toLowerCase().includes(keyword.toLowerCase())
+      opt.toLowerCase().includes(companyName.toLowerCase())
     );
-  }, [keyword, options]);
+  }, [companyName, options]);
 
   // option 선택
   function handleSelect(option: string) {
-    setKeyword(option); // 인풋에 선택된 회사명 표시 f
-    setSelected(option); // 현재 선택된 값 저장 (주황색 표시용)
+    setValue("company_name", option); // 인풋에 반영
     setIsDropdownOpen(false);
     onChange?.(option);
   }
 
   return (
-    <div className="w-full" ref={containerRef}>
+    <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       {label && (
         <label className="mb-[0.8rem] block text-[1.6rem] font-medium text-gray-700">
           {label}
@@ -55,16 +111,19 @@ export default function SearchableDropdown({
       {/* 인풋 + 아이콘 래퍼 */}
       <div className="relative">
         <input
+          id="company_name"
           type="text"
-          value={keyword}
-          onChange={(e) => {
-            setKeyword(e.target.value);
-            if (!isDropdownOpen) setIsDropdownOpen(true);
-          }}
-          onFocus={() => setIsDropdownOpen(true)}
+          // value={companyName}
+          // onChange={(e) => {
+          //   setcompanyName(e.target.value);
+          //   if (!isDropdownOpen) setIsDropdownOpen(true);
+          // }}
           placeholder={placeholder}
-          className="w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[1.6rem] py-[0.8rem] outline-none ring-0
-                     focus:border-primary-500"
+          className={`w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[1.6rem] py-[0.8rem] outline-none ring-0
+                     focus:border-primary-500 ${
+                       errors.company_name ? "error" : ""
+                     }`}
+          {...register("company_name", { required: "회사명은 필수입니다." })}
         />
 
         {/* 아래 화살표 아이콘 영역 */}
@@ -92,7 +151,7 @@ export default function SearchableDropdown({
             ) : (
               <ul className="flex flex-col gap-1">
                 {filteredOptions?.map((option, i) => {
-                  const isSelected = option === selected;
+                  const isSelected = option === companyName;
 
                   return (
                     <li key={i} className="">
@@ -116,19 +175,31 @@ export default function SearchableDropdown({
           </div>
         )}
       </div>
+      <ErrorMsg target={errors.company_name} />
 
-      <div className="mt-[0.8rem] border rounded-md border-grey-300 w-full mb-[3.6rem]">
+      <div className="mt-[0.8rem] border rounded-md border-grey-300 w-full ">
         <textarea
-          id="content"
-          className="inputUnset textareaCustom"
+          id="memo"
+          className={`inputUnset textareaCustom ${errors.memo ? "error" : ""}`}
           rows={10}
           placeholder="회사 소개를 입력하세요."
+          // value={memo}
+          // onChange={(e) => setMemo(e.target.value)}
+          {...register("memo", {
+            required: "회사 소개란은 필수입니다.",
+          })}
         ></textarea>
       </div>
+      <ErrorMsg target={errors.memo} />
 
-      <Button black rounded className="max-w-24 ml-auto py-[0.8rem]">
+      <Button
+        type="submit"
+        black
+        rounded
+        className="max-w-24 ml-auto py-[0.8rem] mt-[3.6rem]"
+      >
         저장
       </Button>
-    </div>
+    </form>
   );
 }
