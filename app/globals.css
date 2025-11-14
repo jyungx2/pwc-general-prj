@@ -1,7 +1,101 @@
 @import "tailwindcss";
 
-@theme inline {
+:root {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.inputUnset {
+  all: unset;
+}
+
+.textareaCustom {
+  display: block;
+  width: 100%;
+  padding: 1.6rem;
+  font-size: 1.6rem;
+  box-sizing: border-box;
+}
+
+.checkboxCustom {
+  position: absolute;
+  pointer-events: none;
+}
+
+@theme {
   --font-sans: var(
     --font-pretendard
   ); /* Tailwind의 폰트 토큰(font-sans)에 Pretendard를 연결 */
+
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-default: #3e3e3e;
+  --color-body: #474747;
+  --color-text-heading: #252525;
+  /* --color-border: #c6c6c8; */
+  --color-scrollbar: #c1c1c1;
+  --color-scroll-track: #f1f1f1;
+
+  --color-grey-100: #f3f4f6;
+  --color-grey-200: #e5e6e9;
+  --color-grey-300: #c6c6c8;
+  --color-grey-400: #a8a8aa;
+  --color-grey-500: #7f7f82;
+
+  --color-primary-100: #fff7e0;
+  --color-primary-300: #ffb27f;
+  --color-primary-500: #f66d00;
+}
+
+.boxShadow {
+  box-shadow: 0px 8px 16px -2px rgba(71, 71, 71, 0.24);
+}
+
+/*
+Source - https://stackoverflow.com/a
+Posted by juliomalves, modified by community. See post 'Timeline' for change history
+Retrieved 2025-11-13, License - CC BY-SA 4.0
+*/
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 13px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    /* border-radius: 100vh; */
+    background: #f1f1f1;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    /* border-radius: 100vh; */
+    border-left: 2px solid #f6f7ed;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c1c1c1;
+  }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

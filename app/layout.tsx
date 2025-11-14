@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { pretendard } from "@/app/fonts";
+import MainHeader from "@/components/main-header/main-header";
+import banner from "@/assets/banner.png";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +17,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pretendard.variable} font-sans antialiased`}>
+      <body
+        className={`max-w-[1680px] mx-auto ${pretendard.variable} font-sans antialiased px-10`}
+      >
+        <MainHeader />
+        <div className="relative w-full h-96">
+          <Image
+            src={banner}
+            alt="banner"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
         {children}
       </body>
     </html>
