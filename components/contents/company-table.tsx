@@ -5,29 +5,10 @@ import { formatKoreanDateTime } from "@/utils/formatDate";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 
-export const rows = [
-  {
-    id: 1,
-    email: "cc.com",
-    company_name: "삼성전자",
-    memo: "최고의 전자회사",
-    created_at: "2025. 07. 18 오후 06:55",
-  },
-  {
-    id: 2,
-    email: "cd.com",
-    company_name: "네이버",
-    memo: "최고의 포털회사",
-    created_at: "2024. 03. 10 오전 11:15",
-  },
-];
-
 export default function CompanyTable({
   favorites,
   onRowClick,
 }: CompanyTableProps) {
-  // const [selected, setSelected] = useState<number[]>([]);
-  // const allChecked = selected.length === rows.length && rows.length > 0;
   const [checked, setChecked] = useState(false);
 
   return (

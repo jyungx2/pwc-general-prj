@@ -7,7 +7,7 @@ export type Company = {
 };
 
 export type Props = {
-  data: Company;
+  selectedCompany: Company;
   onClose: () => void;
 };
 

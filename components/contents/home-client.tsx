@@ -30,7 +30,7 @@ export default function HomeClient({ initialFavorites }: HomeClientProps) {
       />
       {selectedCompany && (
         <CompanyDetailModal
-          data={selectedCompany}
+          selectedCompany={selectedCompany}
           onClose={() => setSelectedCompany(null)}
         />
       )}
