@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { pretendard } from "@/app/fonts";
 import MainHeader from "@/components/main-header/main-header";
-import banner from "@/assets/banner.png";
-import Image from "next/image";
+
 import Providers from "@/app/providers";
 
 export const metadata: Metadata = {
@@ -23,15 +22,6 @@ export default function RootLayout({
       >
         <Providers>
           <MainHeader />
-          <div className="relative w-full h-96">
-            <Image
-              src={banner}
-              alt="banner"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
           {children}
         </Providers>
       </body>

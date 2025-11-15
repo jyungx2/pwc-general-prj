@@ -105,3 +105,32 @@ Retrieved 2025-11-13, License - CC BY-SA 4.0
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+.banner-section {
+  position: relative;
+  z-index: 0;
+}
+
+/* ::before가 진짜 배너 역할 */
+.banner-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%); /* 가운데 정렬 */
+  width: 100vw; /* 브라우저 전체 너비 */
+  height: 24rem; /* 위에서 준 h-[16rem]이랑 맞추기 */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; /* 필요하면 contain으로 변경 가능 */
+  z-index: -1; /* 실제 컨텐츠 뒤로 */
+}
+
+.banner-section--main::before {
+  background-image: url("/banner-main.png");
+}
+
+/* 산업 전문화 과제 배너 */
+.banner-section--optional::before {
+  background-image: url("/banner-optional.png");
+}

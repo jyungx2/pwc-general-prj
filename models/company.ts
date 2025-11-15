@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 export type Company = {
   id: number;
@@ -28,7 +28,6 @@ export type CompanyTableProps = {
   // onChangeSelectedIds: (ids: number[]) => void;
   onChangeSelectedIds: Dispatch<SetStateAction<number[]>>;
   onDeleteOne: (id: number) => void;
-  isDeleting: boolean;
 };
 
 export type SearchableDropdownProps = {
@@ -39,7 +38,8 @@ export type SearchableDropdownProps = {
 };
 
 export type SubHeaderProps = {
-  selectedCount: number;
-  onConfirmDelete: () => void;
-  isDeleting: boolean;
+  title: string;
+  subtitle: string;
+  primaryBtn?: ReactNode;
+  secondaryBtn?: ReactNode;
 };

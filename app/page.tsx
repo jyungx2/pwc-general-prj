@@ -1,5 +1,5 @@
 import HomeClient from "@/components/contents/home-client";
-import { Company } from "@/models/company";
+import { Favorites } from "@/models/company";
 
 async function getFavorites(email: string): Promise<Favorites> {
   // 백엔드 도메인으로 직접 호출 (외부 API)

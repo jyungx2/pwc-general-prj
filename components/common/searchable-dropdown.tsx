@@ -11,6 +11,7 @@ import { axiosClient } from "@/lib/axiosClient";
 import { useForm } from "react-hook-form";
 import ErrorMsg from "@/components/common/error-msg";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 type SaveMemoPayload = {
   email: string;
@@ -68,7 +69,6 @@ export default function SearchableDropdown({
       company_name: string;
       memo: string;
     }) => {
-      console.log("payload: ", payload);
       const res = await axiosClient.post<SaveMemoResponse>(
         "/favorites",
         payload
@@ -83,7 +83,28 @@ export default function SearchableDropdown({
       // ✅ SSR 데이터 다시 가져오기 (서버 fetch 다시 실행)
       router.refresh();
     },
-    onError: () => {
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 422) {
+          // 현재 422 에러 메시지(msg)는 "Field required"
+          alert("요청 값이 올바르지 않습니다. 필수 항목을 다시 확인해주세요.");
+          return;
+        }
+
+        if (status === 400) {
+          // 현재 400 에러 메시지(msg)는 "{}는 이미 관심기업으로 등록되어 있습니다"
+          const serverMsg = error.response?.data?.detail;
+
+          alert(
+            serverMsg ??
+              "요청 값이 올바르지 않습니다. 필수 항목을 다시 확인해주세요."
+          );
+          return;
+        }
+      }
+
       alert("저장 중 오류가 발생했습니다.");
     },
   });
@@ -169,7 +190,7 @@ export default function SearchableDropdown({
                           ${
                             isSelected
                               ? "bg-primary-300 text-body rounded-md"
-                              : "text-gray-900 hover:bg-grey-100 rounded-xs"
+                              : "text-gray-900 hover:bg-grey-100 focus:bg-primary-300 rounded-xs"
                           }`}
                       >
                         {option}

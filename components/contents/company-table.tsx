@@ -10,7 +10,6 @@ export default function CompanyTable({
   selectedIds,
   onChangeSelectedIds,
   onDeleteOne,
-  isDeleting,
 }: CompanyTableProps) {
   // favorites가 변경되면, 존재하지 않는 id는 selectedIds에서 제거
   // useEffect(() => {
@@ -122,7 +121,7 @@ export default function CompanyTable({
                 return (
                   <tr
                     key={row.id}
-                    className={` hover:bg-primary-100 ${
+                    className={`hover:bg-primary-100 ${
                       isChecked ? "bg-primary-100" : ""
                     } [&>td]:px-4 [&>td]:py-3`}
                     onClick={() => onRowClick(row)}
@@ -159,7 +158,6 @@ export default function CompanyTable({
                         className="rounded p-1 hover:bg-red-50 text-grey-300 cursor-pointer"
                         aria-label={`${row.company_name} 삭제`}
                         onClick={() => onDeleteOne(row.id)}
-                        disabled={isDeleting}
                       >
                         <Trash size={20} />
                       </button>
