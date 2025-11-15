@@ -16,7 +16,7 @@ export function Pagination({
 }: PaginationProps) {
   const pages = usePagination(currentPage, totalPages);
 
-  if (totalPages <= 1) return null;
+  if (totalPages < 1) return null;
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === currentPage) return;

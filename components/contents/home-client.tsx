@@ -8,7 +8,7 @@ import { Company } from "@/models/company";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { axiosClient } from "@/lib/axiosClient";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/common/button";
 import { Plus, Trash } from "lucide-react";
 import Modal from "@/components/common/modal";
@@ -21,14 +21,15 @@ import axios from "axios";
 
 type HomeClientProps = {
   initialFavorites: Company[];
+  currentPage: number;
   totalPages: number;
 };
 
 export default function HomeClient({
   initialFavorites,
+  currentPage,
   totalPages,
 }: HomeClientProps) {
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const email = process.env.NEXT_PUBLIC_EMAIL;
 
@@ -41,6 +42,18 @@ export default function HomeClient({
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const searchParams = useSearchParams(); // 현재 URL의 쿼리 파라미터 읽기
+
+  // 페이지 변경: URL의 ?page= 바꾸기 → 서버 컴포넌트가 다시 실행됨
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set("page", String(page)); // 쿼리파라미터 'page' 세팅
+    console.log("params: ", params);
+    router.push(`/?${params.toString()}`);
+    // App Router에서는 push만 해도 해당 경로의 서버 컴포넌트가 다시 호출됨
+  };
 
   // ✅ 공통 삭제 mutation (단일/여러 개 다 여기서)
   const { mutate: deleteFavorites, isPending: isDeleting } = useMutation({
@@ -149,9 +162,9 @@ export default function HomeClient({
           onDeleteOne={handleDeleteOne}
         />
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          currentPage={currentPage} // 서버에서 내려준 현재 페이지
+          totalPages={totalPages} // 총 페이지 개수
+          onPageChange={handlePageChange} // ✅ URL을 바꾸는 함수
         />
         {selectedCompany && (
           <CompanyDetailModal
