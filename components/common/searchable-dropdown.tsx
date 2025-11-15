@@ -10,6 +10,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosClient } from "@/lib/axiosClient";
 import { useForm } from "react-hook-form";
 import ErrorMsg from "@/components/common/error-msg";
+import { useRouter } from "next/navigation";
 
 type SaveMemoPayload = {
   email: string;
@@ -25,8 +26,10 @@ export default function SearchableDropdown({
   label,
   placeholder = "검색어를 입력하세요",
   onChange,
+  onModalOpen,
 }: SearchableDropdownProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
 
   const { data: options = [] } = useQuery({
     queryKey: ["companies"],
@@ -75,7 +78,10 @@ export default function SearchableDropdown({
     onSuccess: (data) => {
       console.log("POST 요청 성공 후 받아온 데이터: ", data);
       alert(data.message ?? "저장되었습니다!");
-      // setContent("");
+      onModalOpen?.((prev) => !prev);
+
+      // ✅ SSR 데이터 다시 가져오기 (서버 fetch 다시 실행)
+      router.refresh();
     },
     onError: () => {
       alert("저장 중 오류가 발생했습니다.");

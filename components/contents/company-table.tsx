@@ -3,13 +3,47 @@
 import { CompanyTableProps } from "@/models/company";
 import { formatKoreanDateTime } from "@/utils/formatDate";
 import { Trash } from "lucide-react";
-import { useState } from "react";
 
 export default function CompanyTable({
   favorites,
   onRowClick,
+  selectedIds,
+  onChangeSelectedIds,
+  onDeleteOne,
+  isDeleting,
 }: CompanyTableProps) {
-  const [checked, setChecked] = useState(false);
+  // favorites가 변경되면, 존재하지 않는 id는 selectedIds에서 제거
+  // useEffect(() => {
+  //   if (!favorites) return;
+  //   setSelectedIds((prev) =>
+  //     prev.filter((id) => favorites.some((f) => f.id === id))
+  //   );
+  // }, [favorites]);
+  const hasFavorites = favorites.length > 0;
+
+  const allChecked =
+    favorites &&
+    favorites.length > 0 &&
+    selectedIds.length === favorites.length;
+
+  // ✅ 전체 선택 / 해제
+  const handleToggleAll = () => {
+    if (!favorites) return;
+    if (allChecked) {
+      // 전부 해제
+      onChangeSelectedIds([]);
+    } else {
+      // 전부 선택
+      onChangeSelectedIds(favorites.map((f) => f.id));
+    }
+  };
+
+  // ✅ 개별 row 선택 / 해제
+  const handleToggleRow = (id: number) => {
+    onChangeSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div className="rounded-lg border border-grey-300 bg-white overflow-hidden">
@@ -41,6 +75,8 @@ export default function CompanyTable({
                 id="allCheck"
                 aria-label="전체 선택"
                 className="peer inputUnset checkboxCustom"
+                checked={allChecked}
+                onChange={handleToggleAll}
               />
               <label
                 className="flex gap-4 cursor-pointer items-end justify-center before:w-8 before:h-8 before:inline-block before:content-[''] before:bg-[url('/icons/unchecked.svg')] peer-checked:before:bg-[url('/icons/checked.svg')] font-gowunBold text-[18px]"
@@ -60,7 +96,11 @@ export default function CompanyTable({
       </table>
 
       {/* 2) 바디 전용 테이블 (여기만 스크롤) */}
-      <div className="max-h-[600px] overflow-y-scroll scrollbar">
+      <div
+        className={`max-h-[600px]  ${
+          hasFavorites ? "overflow-y-auto scrollbar" : ""
+        }`}
+      >
         <table
           className="w-full table-fixed border-collapse border-spacing-0"
           // 이 테이블이 실제 데이터 테이블 역할임을 명시
@@ -76,44 +116,66 @@ export default function CompanyTable({
           </colgroup>
 
           <tbody className="text-text-heading font-regular divide-y divide-border divide-grey-300">
-            {favorites?.map((row) => {
-              // const checked = selected.includes(r.id);
-              return (
-                <tr
-                  key={row.id}
-                  className={` hover:bg-primary-100 ${
-                    checked ? "bg-primary-100" : ""
-                  } [&>td]:px-4 [&>td]:py-3`}
-                  onClick={() => onRowClick(row)}
-                >
-                  {/* scope="row" : 행 헤더    (row header) 이 th 오른쪽 가로 방향(row)의 td들과 연결 */}
-                  <td>
-                    <input
-                      type="checkbox"
-                      id={`check-${row.id}`}
-                      className="peer inputUnset checkboxCustom"
-                    />
-                    <label
-                      className="flex gap-4 cursor-pointer items-end justify-center before:w-8 before:h-8 before:inline-block before:content-[''] before:bg-[url('/icons/unchecked.svg')] peer-checked:before:bg-[url('/icons/checked.svg')] font-gowunBold text-[18px]"
-                      htmlFor={`check-${row.id}`}
-                    ></label>
-                  </td>
-                  <td>{row.company_name}</td>
-                  <td>{formatKoreanDateTime(row.created_at)}</td>
-                  <td className="text-right">
-                    <button
-                      className="rounded p-1 hover:bg-red-50 text-grey-300 cursor-pointer"
-                      aria-label={`${row.company_name} 삭제`}
-                      onClick={() => {
-                        /* 삭제 mutate */
+            {hasFavorites ? (
+              favorites?.map((row) => {
+                const isChecked = selectedIds.includes(row.id);
+                return (
+                  <tr
+                    key={row.id}
+                    className={` hover:bg-primary-100 ${
+                      isChecked ? "bg-primary-100" : ""
+                    } [&>td]:px-4 [&>td]:py-3`}
+                    onClick={() => onRowClick(row)}
+                  >
+                    {/* scope="row" : 행 헤더    (row header) 이 th 오른쪽 가로 방향(row)의 td들과 연결 */}
+                    <td
+                      onClick={(e) => {
+                        // 체크박스 클릭이 row 클릭(onRowClick)으로 전파되지 않게 막기
+                        e.stopPropagation();
                       }}
                     >
-                      <Trash size={20} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                      <input
+                        type="checkbox"
+                        id={`check-${row.id}`}
+                        className="peer inputUnset checkboxCustom"
+                        checked={isChecked}
+                        onChange={() => handleToggleRow(row.id)}
+                      />
+                      <label
+                        className="flex gap-4 cursor-pointer items-end justify-center before:w-8 before:h-8 before:inline-block before:content-[''] before:bg-[url('/icons/unchecked.svg')] peer-checked:before:bg-[url('/icons/checked.svg')] font-gowunBold text-[18px]"
+                        htmlFor={`check-${row.id}`}
+                      ></label>
+                    </td>
+                    <td>{row.company_name}</td>
+                    <td>{formatKoreanDateTime(row.created_at)}</td>
+                    <td
+                      className="text-right"
+                      onClick={(e) => {
+                        // 휴지통 클릭 시에도 행 클릭 막기
+                        e.stopPropagation();
+                      }}
+                    >
+                      <button
+                        className="rounded p-1 hover:bg-red-50 text-grey-300 cursor-pointer"
+                        aria-label={`${row.company_name} 삭제`}
+                        onClick={() => onDeleteOne(row.id)}
+                        disabled={isDeleting}
+                      >
+                        <Trash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={4} className="h-180  text-center text-grey-500">
+                  <div className="flex items-center justify-center text-grey-500 min-h-80 max-h-[40vh] text-[1.8rem]">
+                    현재 등록한 관심기업은 없습니다.
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

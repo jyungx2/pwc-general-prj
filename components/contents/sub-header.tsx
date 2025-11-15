@@ -9,10 +9,25 @@ import Xbutton from "@/assets/xbtn.svg";
 import Xbutton2 from "@/assets/xbtn-2.svg";
 import Xcircle from "@/assets/xcircle.svg";
 import Image from "next/image";
+import { SubHeaderProps } from "@/models/company";
 
-export default function SubHeader() {
+export default function SubHeader({
+  selectedCount,
+  onConfirmDelete,
+  isDeleting,
+}: SubHeaderProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const handleOpenDeleteModal = () => {
+    if (!selectedCount) return;
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onConfirmDelete();
+    setIsDeleteOpen(false);
+  };
 
   return (
     <div className="flex justify-between">
@@ -36,7 +51,8 @@ export default function SubHeader() {
           white
           rounded
           icon={<Trash size={20} />}
-          onClick={() => setIsDeleteOpen(true)}
+          onClick={() => handleOpenDeleteModal()}
+          disabled={!selectedCount || isDeleting}
         >
           관심기업 삭제
         </Button>
@@ -45,7 +61,7 @@ export default function SubHeader() {
       {isCreateOpen && (
         <Modal
           onClose={() => setIsCreateOpen(false)}
-          className="w-240 p-[2rem] pt-0 gap-[3.2rem]"
+          className="w-240 p-8 pt-0 gap-[3.2rem]"
         >
           <div className="flex justify-between border-b border-grey-300 py-[1.4rem] -mx-8 px-8 ">
             <h1 className="text-[1.8rem] font-semibold ">관심기업 생성</h1>
@@ -64,6 +80,7 @@ export default function SubHeader() {
             // value={selectedCompany}
             // onChange={setSelectedCompany}
             placeholder="회사명을 입력하세요"
+            onModalOpen={setIsCreateOpen}
           />
         </Modal>
       )}
@@ -83,7 +100,9 @@ export default function SubHeader() {
           <Image src={Xcircle} alt="x-circle" />
 
           <div className="flex flex-col gap-[1.2rem]">
-            <p className="font-bold text-[2.4rem]">총 2개 삭제하시겠습니까?</p>
+            <p className="font-bold text-[2.4rem]">
+              총 {selectedCount}개 삭제하시겠습니까?
+            </p>
 
             <p className="flex flex-col gap-2 justify-center items-center">
               <span>관심기업 삭제시 복구할 수 없습니다.</span>
@@ -92,10 +111,20 @@ export default function SubHeader() {
           </div>
 
           <div className="w-full flex flex-col gap-[1.2rem]">
-            <Button black rounded>
+            <Button
+              black
+              rounded
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
               삭제
             </Button>
-            <Button white rounded onClick={() => setIsDeleteOpen(false)}>
+            <Button
+              white
+              rounded
+              onClick={() => setIsDeleteOpen(false)}
+              disabled={isDeleting}
+            >
               취소
             </Button>
           </div>
