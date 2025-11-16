@@ -33,7 +33,6 @@ export type CompanyTableProps = {
 export type SearchableDropdownProps = {
   label?: string;
   placeholder?: string;
-  onChange?: (option: string) => void;
   onModalOpen?: Dispatch<SetStateAction<boolean>>;
 };
 

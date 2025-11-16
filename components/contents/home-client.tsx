@@ -192,9 +192,6 @@ export default function HomeClient({
 
           <SearchableDropdown
             label="관심기업 검색"
-            // options={COMPANY_OPTIONS}
-            // value={selectedCompany}
-            // onChange={setSelectedCompany}
             placeholder="회사명을 입력하세요"
             onModalOpen={setIsCreateOpen}
           />

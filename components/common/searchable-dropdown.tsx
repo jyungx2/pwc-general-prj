@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ChevronUp from "@/assets/chevron-up.svg";
 import ChevronDown from "@/assets/chevron-down.svg";
 import Button from "@/components/common/button";
@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import ErrorMsg from "@/components/common/error-msg";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useCompanies } from "@/hooks/useCompanies";
 
 type SaveMemoPayload = {
   email: string;
@@ -25,21 +26,13 @@ type SaveMemoResponse = {
 
 export default function SearchableDropdown({
   label,
-  placeholder = "검색어를 입력하세요",
-  onChange,
+  placeholder,
   onModalOpen,
 }: SearchableDropdownProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
 
-  const { data: options = [] } = useQuery({
-    queryKey: ["companies"],
-    queryFn: async () => {
-      const res = await axiosClient.get("/companies");
-      const data = res.data.companies;
-      return data;
-    },
-  });
+  const { data: options = [] } = useCompanies();
 
   const {
     register,
@@ -125,7 +118,6 @@ export default function SearchableDropdown({
   function handleSelect(option: string) {
     setValue("company_name", option); // 인풋에 반영
     setIsDropdownOpen(false);
-    onChange?.(option);
   }
 
   return (
@@ -141,17 +133,15 @@ export default function SearchableDropdown({
         <input
           id="company_name"
           type="text"
-          // value={companyName}
-          // onChange={(e) => {
-          //   setcompanyName(e.target.value);
-          //   if (!isDropdownOpen) setIsDropdownOpen(true);
-          // }}
           placeholder={placeholder}
           className={`w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[1.6rem] py-[0.8rem] outline-none ring-0
                      focus:border-primary-500 ${
                        errors.company_name ? "error" : ""
                      }`}
-          {...register("company_name", { required: "회사명은 필수입니다." })}
+          {...register("company_name", {
+            required: "회사명은 필수입니다.",
+            onChange: () => setIsDropdownOpen(true),
+          })}
         />
 
         {/* 아래 화살표 아이콘 영역 */}
@@ -211,8 +201,6 @@ export default function SearchableDropdown({
           className={`inputUnset textareaCustom ${errors.memo ? "error" : ""}`}
           rows={10}
           placeholder="회사 소개를 입력하세요."
-          // value={memo}
-          // onChange={(e) => setMemo(e.target.value)}
           {...register("memo", {
             required: "회사 소개란은 필수입니다.",
           })}

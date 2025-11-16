@@ -15,7 +15,7 @@ function Button({
   // }
 
   const classes = classNames(
-    "flex gap-2 items-center justify-center w-full h-[3.8rem] px-[1.6rem] leading-[2.2rem] tracking-[0%] border font-medium text-[1.6rem] whitespace-nowrap cursor-pointer",
+    "flex gap-2 items-center justify-center w-auto h-[3.8rem] px-[1.6rem] leading-[2.2rem] tracking-[0%] border font-medium text-[1.6rem] whitespace-nowrap cursor-pointer",
     {
       "bg-grey-60 text-white cursor-not-allowed": blocked,
       "rounded-[0.4rem]": rounded,

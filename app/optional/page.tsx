@@ -1,8 +1,47 @@
 "use client";
 
+import FinancialSearchForm from "@/components/financial/financial-search-form";
+import FinancialViewer from "@/components/financial/financial-viewer";
 import SubHeader from "@/components/contents/sub-header";
+import {
+  FinancialApiResponse,
+  FinancialSearchFormValues,
+  FinancialTableRow,
+} from "@/models/financial";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function OptionalPage() {
+  const [rows, setRows] = useState<FinancialTableRow[] | null>(null);
+
+  const financialsMutation = useMutation({
+    mutationFn: async (
+      values: FinancialSearchFormValues
+    ): Promise<FinancialApiResponse> => {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      const params = new URLSearchParams(values);
+      console.log("재무제표 조회 시 들어오는 params: ", params);
+
+      const res = await fetch(`/api/financials?${params.toString()}`);
+      if (!res.ok) {
+        throw new Error(
+          "💥 단일회사 전체 재무제표 가져오는 OPENDART API 요청 실패"
+        );
+      }
+      const financialData = res.json();
+
+      return financialData;
+    },
+    onSuccess: (data) => {
+      setRows(data.rows); // 또는 setRows(data.rows) 없이 data 바로 내려줘도 되고
+    },
+  });
+
+  const handleSearch = (values: FinancialSearchFormValues) => {
+    financialsMutation.mutate(values);
+  };
+
   return (
     <>
       <section className="banner-section banner-section--optional">
@@ -14,10 +53,10 @@ export default function OptionalPage() {
         <SubHeader
           title="기업 재무제표 조회"
           subtitle="기업명과 보고서 옵션을 선택하여 제무제표를 조회해보세요."
-          // selectedCount={selectedIds?.length}
-          // onConfirmDelete={handleDeleteSelected}
-          // isDeleting={isPending}
         />
+
+        <FinancialSearchForm onSubmit={handleSearch} />
+        <FinancialViewer loading={financialsMutation.isPending} rows={rows} />
       </div>
     </>
   );
