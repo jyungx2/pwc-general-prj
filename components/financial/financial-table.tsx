@@ -11,7 +11,6 @@ export default function FinancialTable({ rows }: FinancialTableProps) {
       </div>
     );
   }
-
   const first = rows[0];
   const thLabel = first.thstrmName || "당기";
   const frmLabel = first.frmtrmName || "전기";

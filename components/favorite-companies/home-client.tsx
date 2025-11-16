@@ -1,7 +1,7 @@
 "use client";
 
-import CompanyTable from "@/components/contents/company-table";
-import CompanyDetailModal from "@/components/contents/company-detail";
+import CompanyTable from "@/components/favorite-companies/company-table";
+import CompanyDetailModal from "@/components/favorite-companies/company-detail";
 import SubHeader from "@/components/common/sub-header";
 import { Pagination } from "@/components/pagination/pagination";
 import { Company } from "@/models/company";
@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/common/button";
 import { Plus, Trash } from "lucide-react";
 import Modal from "@/components/common/modal";
-import SearchableDropdown from "@/components/common/searchable-dropdown";
+import SearchableDropdown from "@/components/favorite-companies/searchable-dropdown";
 import Xbutton from "@/assets/xbtn.svg";
 import Xbutton2 from "@/assets/xbtn-2.svg";
 import Xcircle from "@/assets/xcircle.svg";

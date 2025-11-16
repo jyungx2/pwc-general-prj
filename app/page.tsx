@@ -1,4 +1,4 @@
-import HomeClient from "@/components/contents/home-client";
+import HomeClient from "@/components/favorite-companies/home-client";
 import { Favorites } from "@/models/company";
 
 async function getFavorites(email: string, page: number): Promise<Favorites> {
@@ -7,7 +7,7 @@ async function getFavorites(email: string, page: number): Promise<Favorites> {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/favorites?email=${email}&page=${page}`,
     {
       cache: "no-store", // SSR (항상 새로 그리기) 느낌
-      //   cache: "force-cache", // 기본값 ("같은 fetch 결과를 캐시로 재사용해도 된다”는 허용만 하는 옵션으로, revalidate를 쓰면 N초마다 다시 확인하는 ISR, revalidate 없이 쓰면 캐시를 쓰는데, 재검증 주기는 다른 레벨(경로/루트 레벨 설정 등)에 따라 결정한다는 의미)
+      // cache: "force-cache", // 기본값 ("같은 fetch 결과를 캐시로 재사용해도 된다”는 허용만 하는 옵션으로, revalidate를 쓰면 N초마다 다시 확인하는 ISR, revalidate 없이 쓰면 캐시를 쓰는데, 재검증 주기는 다른 레벨(경로/루트 레벨 설정 등)에 따라 결정한다는 의미)
       //   next: { revalidate: N } → ISR (캐시 + 주기적 재검증) 설정
     }
   );
