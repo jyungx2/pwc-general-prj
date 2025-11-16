@@ -2,7 +2,7 @@
 
 import CompanyTable from "@/components/contents/company-table";
 import CompanyDetailModal from "@/components/contents/company-detail";
-import SubHeader from "@/components/contents/sub-header";
+import SubHeader from "@/components/common/sub-header";
 import { Pagination } from "@/components/pagination/pagination";
 import { Company } from "@/models/company";
 import { useEffect, useState } from "react";

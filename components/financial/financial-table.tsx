@@ -20,7 +20,7 @@ export default function FinancialTable({ rows }: FinancialTableProps) {
   return (
     <section
       aria-label="기업 재무제표 표"
-      className="mt-8 rounded-md border border-grey-200 bg-white"
+      className="m-4 rounded-md border border-grey-200 bg-white"
     >
       {/* 스크롤 생기더라도 전체 표는 깨지지 않게 */}
       <div className="overflow-x-auto">
