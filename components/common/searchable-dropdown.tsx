@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ChevronUp from "@/assets/chevron-up.svg";
 import ChevronDown from "@/assets/chevron-down.svg";
 import Button from "@/components/common/button";
 import { SearchableDropdownProps } from "@/models/company";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { axiosClient } from "@/lib/axiosClient";
 import { useForm } from "react-hook-form";
 import ErrorMsg from "@/components/common/error-msg";

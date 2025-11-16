@@ -1,5 +1,14 @@
 import { SubmitHandler } from "react-hook-form";
 
+export type FinancialApiResponse = {
+  corpName: string;
+  corpCode: string;
+  bsnsYear: string;
+  reprtCode: string;
+  fsDiv: string;
+  rows: FinancialTableRow[];
+};
+
 export type CorpCodeEntry = {
   corp_code: string;
   corp_name: string;
@@ -57,11 +66,12 @@ export type FinancialTableProps = {
   rows: FinancialTableRow[];
 };
 
-export type FinancialApiResponse = {
-  corpName: string;
-  corpCode: string;
-  bsnsYear: string;
-  reprtCode: string;
-  fsDiv: string;
-  rows: FinancialTableRow[];
+export type FinancialError = {
+  message: string;
+};
+
+export type FinancialViewerProps = {
+  rows: FinancialTableRow[] | null;
+  loading: boolean;
+  error: FinancialError | null;
 };
