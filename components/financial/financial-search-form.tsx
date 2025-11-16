@@ -2,8 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import Capture from "@/assets/capture.svg";
+import Loading from "@/assets/loading.svg";
+import Reset from "@/assets/reset.svg";
 import Button from "@/components/common/button";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Search from "@/assets/search.svg";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -29,9 +31,32 @@ const fsOptions = [
 
 export default function FinancialSearchForm({
   onSubmit,
+  loading,
+  hasSearched,
 }: FinancialSearchFormProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { data: options = [] } = useCompanies();
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null); // ⭐ 기업명 영역 래퍼 ref
+
+  // --- 바깥 클릭 시 드롭다운 닫기 ---
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const {
     register,
@@ -44,19 +69,19 @@ export default function FinancialSearchForm({
       corpName: "",
       bsnsYear: "",
       reprtCode: "",
-      fsDiv: undefined,
+      fsDiv: "",
     },
   });
 
-  const companyName = watch("corpName");
+  const corpName = watch("corpName");
 
   // 검색 필터링
   const filteredOptions = useMemo<string[]>(() => {
-    if (!companyName.trim()) return options;
+    if (!corpName.trim()) return options;
     return options.filter((opt: string) =>
-      opt.toLowerCase().includes(companyName.toLowerCase())
+      opt.toLowerCase().includes(corpName.toLowerCase())
     );
-  }, [companyName, options]);
+  }, [corpName, options]);
 
   // option 선택
   function handleSelect(option: string) {
@@ -79,14 +104,15 @@ export default function FinancialSearchForm({
             <span className="text-primary-500 mr-1">*</span>
             <span>기업명</span>
           </label>
-          <div className="relative flex-1">
+
+          <div className="relative flex-1" ref={dropdownRef}>
             <input
               id="corpName"
               type="text"
-              className={`w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[0.8rem] py-[0.8rem] outline-none ring-0
-                             focus:border-primary-500 ${
-                               errors.corpName ? "error" : ""
-                             }`}
+              placeholder="기업명을 입력하세요."
+              className={`w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[0.8rem] py-[0.8rem] outline-none ring-0 ${
+                errors.corpName ? "error" : ""
+              }`}
               {...register("corpName", {
                 required: "기업명을 입력해주세요.",
                 onChange: () => setIsDropdownOpen(true),
@@ -97,7 +123,7 @@ export default function FinancialSearchForm({
             <button
               type="button"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
-              className="absolute inset-y-0 right-0 flex items-center pr-[0.8rem]"
+              className="absolute inset-y-0 right-0 flex items-center pr-[0.8rem] cursor-pointer"
             >
               <Image src={Search} alt="dropdown-chevron" />
             </button>
@@ -115,7 +141,7 @@ export default function FinancialSearchForm({
                 ) : (
                   <ul className="flex flex-col gap-1">
                     {filteredOptions?.map((option, i) => {
-                      const isSelected = option === companyName;
+                      const isSelected = option === corpName;
 
                       return (
                         <li key={i} className="">
@@ -141,93 +167,112 @@ export default function FinancialSearchForm({
           </div>
         </div>
 
-        <ErrorMsg target={errors.corpName} className="ml-32 mt-4" />
+        <ErrorMsg target={errors.corpName} className="ml-32 mt-2" />
       </div>
 
       {/* 사업연도 */}
-      <div className="flex gap-2">
-        <label
-          htmlFor="bsnsYear"
-          className="flex items-center w-32 mb-1 font-semibold"
-        >
-          <span className="text-primary-500 mr-1">*</span>
-          <span>사업연도</span>
-        </label>
-        <select
-          id="bsnsYear"
-          className={`dropdownDesign ${errors.bsnsYear ? "error" : ""}`}
-          {...register("bsnsYear", {
-            required: "사업연도를 선택해주세요.",
-          })}
-        >
-          {yearOptions.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-        <ErrorMsg target={errors.bsnsYear} />
+      <div className="flex flex-col">
+        <div className="flex gap-2">
+          <label
+            htmlFor="bsnsYear"
+            className="flex items-center w-32 mb-1 font-semibold"
+          >
+            <span className="text-primary-500 mr-1">*</span>
+            <span>사업연도</span>
+          </label>
+          <select
+            id="bsnsYear"
+            className={`dropdownDesign ${errors.bsnsYear ? "error" : ""}`}
+            {...register("bsnsYear", {
+              required: "사업연도를 선택해주세요.",
+            })}
+          >
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <ErrorMsg target={errors.bsnsYear} className="ml-32 mt-2" />
       </div>
 
       {/* 보고서명 */}
-      <div className="flex gap-2">
-        <label
-          htmlFor="reprtCode"
-          className="flex items-center w-32 mb-1 font-semibold"
-        >
-          <span className="text-primary-500 mr-1">*</span>
-          <span>보고서명</span>
-        </label>
-        <select
-          id="reprtCode"
-          className={`dropdownDesign ${errors.reprtCode ? "error" : ""}`}
-          {...register("reprtCode", {
-            required: "보고서명을 선택해주세요.",
-          })}
-        >
-          {reportOptions.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        <ErrorMsg target={errors.reprtCode} />
+      <div className="flex flex-col">
+        <div className="flex gap-2">
+          <label
+            htmlFor="reprtCode"
+            className="flex items-center w-32 mb-1 font-semibold"
+          >
+            <span className="text-primary-500 mr-1">*</span>
+            <span>보고서명</span>
+          </label>
+          <select
+            id="reprtCode"
+            className={`dropdownDesign ${errors.reprtCode ? "error" : ""}`}
+            {...register("reprtCode", {
+              required: "보고서명을 선택해주세요.",
+            })}
+          >
+            {reportOptions.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <ErrorMsg target={errors.reprtCode} className="ml-32 mt-2" />
       </div>
 
       {/* 재무제표 종류 */}
-      <div className="flex gap-2">
-        <label
-          htmlFor="fsDiv"
-          className="flex items-center w-32 mb-1 font-semibold"
-        >
-          <span className="text-primary-500 mr-1">*</span>
-          <span>재무제표</span>
-        </label>
-        <select
-          id="fsDiv"
-          className={`dropdownDesign ${errors.fsDiv ? "error" : ""}`}
-          {...register("fsDiv", {
-            required: "재무제표 유형을 선택해주세요.",
-          })}
-        >
-          <option value="" disabled selected>
-            재무제표 유형을 선택해주세요.
-          </option>
-          {fsOptions.map((f) => (
-            <option key={f.value} value={f.value}>
-              {f.label}
-            </option>
-          ))}
-        </select>
-        <ErrorMsg target={errors.fsDiv} />
+      <div className="flex flex-col">
+        <div className="flex gap-2">
+          <label
+            htmlFor="fsDiv"
+            className="flex items-center w-32 mb-1 font-semibold"
+          >
+            <span className="text-primary-500 mr-1">*</span>
+            <span>재무제표</span>
+          </label>
+          <select
+            id="fsDiv"
+            className={`dropdownDesign ${errors.fsDiv ? "error" : ""}`}
+            {...register("fsDiv", {
+              required: "재무제표 유형을 선택해주세요.",
+            })}
+          >
+            {fsOptions.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <ErrorMsg target={errors.fsDiv} className="ml-32 mt-2" />
       </div>
 
       <Button
         type="submit"
-        icon={<Image src={Capture} alt="검색 아이콘" />}
-        black
+        icon={
+          loading ? (
+            <Image src={Loading} alt="로딩 아이콘" />
+          ) : hasSearched ? (
+            <Image src={Reset} alt="다시 조회 아이콘" />
+          ) : (
+            <Image src={Capture} alt="검색 아이콘" />
+          )
+        }
+        black={!loading}
         rounded
-        className="self-center gap-[0.8rem] px-[6rem]"
+        blocked={loading}
+        className={`self-center gap-[0.8rem] px-[6rem] ${
+          loading
+            ? "bg-default-bg! text-default-text! border-none opacity-30"
+            : ""
+        }`}
       >
         검색
       </Button>

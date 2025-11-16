@@ -11,13 +11,6 @@ export default function CompanyTable({
   onChangeSelectedIds,
   onDeleteOne,
 }: CompanyTableProps) {
-  // favorites가 변경되면, 존재하지 않는 id는 selectedIds에서 제거
-  // useEffect(() => {
-  //   if (!favorites) return;
-  //   setSelectedIds((prev) =>
-  //     prev.filter((id) => favorites.some((f) => f.id === id))
-  //   );
-  // }, [favorites]);
   const hasFavorites = favorites.length > 0;
 
   const allChecked =
@@ -62,7 +55,7 @@ export default function CompanyTable({
           {/* 4열: 휴지통 */}
         </colgroup>
 
-        <thead className="sticky top-0 z-10 bg-grey-100 text-default font-semibold border-b border-grey-300">
+        <thead className="sticky top-0 z-10 bg-grey-100 text-default-text font-semibold border-b border-grey-300">
           {/* [&>th]: 각 셀의 스타일링 => 패딩 / 타이포그래피 / 정렬 */}
           <tr className="[&>th]:px-4 [&>th]:py-4 h-20">
             {/* scope="col" = “이 헤더 셀이 어느 열의 ‘제목’인지?” */}

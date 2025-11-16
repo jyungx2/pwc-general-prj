@@ -5,7 +5,7 @@ import CompanyDetailModal from "@/components/contents/company-detail";
 import SubHeader from "@/components/contents/sub-header";
 import { Pagination } from "@/components/pagination/pagination";
 import { Company } from "@/models/company";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { axiosClient } from "@/lib/axiosClient";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -44,6 +44,21 @@ export default function HomeClient({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const searchParams = useSearchParams(); // 현재 URL의 쿼리 파라미터 읽기
+
+  // FIXME: 페이지 이동 시 선택된 체크박스 초기화 로직
+  // 기존에는 currentPage가 바뀔 때마다 effect에서 setSelectedIds([])를 호출해서
+  // "페이지가 바뀌면 선택 상태를 비운다"는 동작을 구현하려고 했지만..
+  // useEffect(() => {
+  //   setSelectedIds([]);
+  // }, [currentPage]);
+
+  // effect 안에서 props(currentPage) → state(selectedIds)처럼
+  // 내부 파생 상태만 갱신하는 패턴은
+  // - React가 권장하는 "외부 시스템과의 동기화용 effect" 용도와 맞지 않고
+  // - 불필요한 추가 렌더링(cascading renders)을 유발할 수 있어 경고가 발생함.
+
+  // 그래서 이 로직은 사용하지 않고, 상위 컴포넌트에서 key={currentPage}를 주어
+  // HomeClient 전체를 페이지마다 새로 마운트시키는 방식으로 상태를 초기화한다.
 
   // 페이지 변경: URL의 ?page= 바꾸기 → 서버 컴포넌트가 다시 실행됨
   const handlePageChange = (page: number) => {
@@ -121,6 +136,14 @@ export default function HomeClient({
     setIsDeleteOpen(false);
   };
 
+  const handleOpenDeleteModal = () => {
+    if (!selectedIds.length) {
+      alert("삭제할 관심기업을 선택해주세요.");
+      return;
+    }
+    setIsDeleteOpen(true);
+  };
+
   return (
     <>
       <section className="banner-section banner-section--main">
@@ -147,8 +170,8 @@ export default function HomeClient({
               white
               rounded
               icon={<Trash size={20} />}
-              onClick={() => setIsDeleteOpen(true)}
-              disabled={!selectedCount || isDeleting}
+              onClick={handleOpenDeleteModal}
+              disabled={isDeleting}
             >
               관심기업 삭제
             </Button>
@@ -192,7 +215,6 @@ export default function HomeClient({
 
           <SearchableDropdown
             label="관심기업 검색"
-            placeholder="회사명을 입력하세요"
             onModalOpen={setIsCreateOpen}
           />
         </Modal>

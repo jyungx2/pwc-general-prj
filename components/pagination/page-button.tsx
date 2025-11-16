@@ -14,7 +14,7 @@ export default function PaginationButton({
       className={[
         "min-w-16 h-16 leading-16 inline-flex items-center justify-center rounded-md cursor-pointer",
         "transition-colors",
-        disabled && "cursor-not-allowed text-grey-400 bg-default",
+        disabled && "cursor-not-allowed text-grey-400 bg-default-text",
         isActive
           ? "bg-black text-white border-black"
           : "bg-white text-gray-700 hover:bg-gray-100",

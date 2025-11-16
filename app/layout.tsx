@@ -17,12 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`max-w-[1680px] mx-auto ${pretendard.variable} font-sans antialiased px-10`}
-      >
+      <body className={`${pretendard.variable} font-sans antialiased`}>
         <Providers>
-          <MainHeader />
-          {children}
+          <div className="min-h-screen max-w-[1680px] mx-auto px-10 overflow-x-hidden">
+            <MainHeader /> {/* 여기서는 px-10 안 써도 이미 감싸짐 */}
+            <main>{children}</main>
+          </div>
         </Providers>
       </body>
     </html>

@@ -32,7 +32,6 @@ export type CompanyTableProps = {
 
 export type SearchableDropdownProps = {
   label?: string;
-  placeholder?: string;
   onModalOpen?: Dispatch<SetStateAction<boolean>>;
 };
 

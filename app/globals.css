@@ -45,11 +45,16 @@ img {
   background-color: #fff;
   outline: none;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .error,
 .error:focus-within {
   border: 2px solid #e73434;
+}
+
+.not-found {
+  display: flex;
 }
 
 @theme {
@@ -60,9 +65,10 @@ img {
   --color-red: #e73434;
   --color-black: #000000;
   --color-white: #ffffff;
-  --color-default: #3e3e3e;
+  --color-default-text: #3e3e3e;
   --color-body: #474747;
   --color-text-heading: #252525;
+  --color-default-bg: #c4c4c4;
   /* --color-border: #c6c6c8; */
   --color-scrollbar: #c1c1c1;
   --color-scroll-track: #f1f1f1;

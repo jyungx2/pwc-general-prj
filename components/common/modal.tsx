@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 interface ModalProps {
   children: ReactNode;
@@ -14,6 +14,16 @@ export default function Modal({
   modalClassName,
   className,
 }: ModalProps) {
+  // 모달이 열려 있는 동안 body 스크롤 막기
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   // 바깥쪽 배경 클릭 시 닫기
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (onClose && e.target === e.currentTarget) {

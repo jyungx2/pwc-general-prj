@@ -10,13 +10,15 @@ export type FinancialSearchFormValues = {
   corpName: string;
   bsnsYear: string;
   reprtCode: string;
-  fsDiv: "OFS" | "CFS";
+  fsDiv: string;
 };
 
 export type FinancialSearchFormProps = {
   // onSubmit: (values: FinancialSearchFormValues) => void;
   // 부모 페이지(OptionalPage)에서 props(useMutation)로 받은 onSubmit 함수는 financial-search-form에서 react-hook-form 기능의 handleSubmit()안에서 불러와지므로...
   onSubmit: SubmitHandler<FinancialSearchFormValues>;
+  loading: boolean;
+  hasSearched: boolean;
 };
 
 export type DartSingleAccountResponse = {

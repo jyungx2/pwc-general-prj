@@ -26,7 +26,6 @@ type SaveMemoResponse = {
 
 export default function SearchableDropdown({
   label,
-  placeholder,
   onModalOpen,
 }: SearchableDropdownProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -133,13 +132,13 @@ export default function SearchableDropdown({
         <input
           id="company_name"
           type="text"
-          placeholder={placeholder}
+          placeholder="기업명을 입력하세요."
           className={`w-full h-16 text-[1.6rem] rounded-md border border-grey-300 bg-white px-[1.6rem] py-[0.8rem] outline-none ring-0
                      focus:border-primary-500 ${
                        errors.company_name ? "error" : ""
                      }`}
           {...register("company_name", {
-            required: "회사명은 필수입니다.",
+            required: "기업명은 필수입니다.",
             onChange: () => setIsDropdownOpen(true),
           })}
         />
@@ -200,9 +199,9 @@ export default function SearchableDropdown({
           id="memo"
           className={`inputUnset textareaCustom ${errors.memo ? "error" : ""}`}
           rows={10}
-          placeholder="회사 소개를 입력하세요."
+          placeholder="기업 소개를 입력하세요."
           {...register("memo", {
-            required: "회사 소개란은 필수입니다.",
+            required: "기업 소개란은 필수입니다.",
           })}
         ></textarea>
       </div>

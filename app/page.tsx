@@ -72,6 +72,7 @@ export default async function Home(props: PageProps) {
   //      Pagination 컴포넌트에서 현재 페이지 하이라이트, 이전/다음 버튼 상태 등을 관리
   return (
     <HomeClient
+      key={currentPage} // 페이지 번호가 바뀌면 이 HomeClient는 새로운 컴포넌트로 취급
       initialFavorites={items}
       currentPage={currentPage}
       totalPages={total_pages}

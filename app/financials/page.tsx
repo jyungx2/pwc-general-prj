@@ -13,6 +13,7 @@ import { useState } from "react";
 
 export default function OptionalPage() {
   const [rows, setRows] = useState<FinancialTableRow[] | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const financialsMutation = useMutation({
     mutationFn: async (
@@ -34,13 +35,16 @@ export default function OptionalPage() {
       return financialData;
     },
     onSuccess: (data) => {
-      setRows(data.rows); // 또는 setRows(data.rows) 없이 data 바로 내려줘도 되고
+      setRows(data.rows);
+      setHasSearched(true); // 성공하면 true -> 검색버튼 UI 조정
     },
   });
 
   const handleSearch = (values: FinancialSearchFormValues) => {
     financialsMutation.mutate(values);
   };
+
+  const isLoading = financialsMutation.isPending;
 
   return (
     <>
@@ -55,8 +59,12 @@ export default function OptionalPage() {
           subtitle="기업명과 보고서 옵션을 선택하여 제무제표를 조회해보세요."
         />
 
-        <FinancialSearchForm onSubmit={handleSearch} />
-        <FinancialViewer loading={financialsMutation.isPending} rows={rows} />
+        <FinancialSearchForm
+          onSubmit={handleSearch}
+          loading={isLoading}
+          hasSearched={hasSearched}
+        />
+        <FinancialViewer loading={isLoading} rows={rows} />
       </div>
     </>
   );

@@ -14,7 +14,7 @@ export default function MainHeader() {
           </li>
 
           <li>
-            <NavLink href="/optional">산업 전문화 과제</NavLink>
+            <NavLink href="/financials">산업 전문화 과제</NavLink>
           </li>
         </ul>
       </nav>
